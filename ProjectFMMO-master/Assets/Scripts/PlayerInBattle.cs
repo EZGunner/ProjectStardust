@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public enum Actions {
     JUMP,
@@ -16,14 +15,45 @@ public class PlayerInBattle : MonoBehaviour {
 
     List<GameObject> validEnemies;
 
+    public Transform arrow; //point at single target
+
+    int currentSelection;
+    bool selectingSingleTarget = false;
+
     // Start is called before the first frame update
     void Start() {
-
+        arrow.GetComponent<SpriteRenderer>().enabled = false;
     }
 
     // Update is called once per frame
     void Update() {
-
+        if (selectingSingleTarget) {
+            arrow.GetComponent<SpriteRenderer>().enabled = true;
+            if (Input.GetKeyDown(KeyCode.RightArrow)) {
+                if (currentSelection == validEnemies.Count - 1) {
+                    currentSelection = 0;
+                }
+                else {
+                    currentSelection++;
+                }
+                SetCursor(validEnemies);
+            }
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) {
+                if (currentSelection == 0) {
+                    currentSelection = validEnemies.Count - 1;
+                }
+                else {
+                    currentSelection--;
+                }
+                SetCursor(validEnemies);
+            }
+            if (Input.GetKeyDown(KeyCode.Return)) {
+                validEnemies[currentSelection].GetComponent<Enemy>().TakeDamage(1);
+                currentSelection = 0;
+                arrow.GetComponent<SpriteRenderer>().enabled = false;
+                selectingSingleTarget = false;
+            }
+        }
     }
 
     public void DoAction(int actionChosen) {
@@ -33,6 +63,7 @@ public class PlayerInBattle : MonoBehaviour {
             validEnemies = ListAllEnemies((int)Actions.JUMP);
             if (validEnemies.Count > 0) {
                 print("jump on something");
+                SetCursor(validEnemies);
             }
             else {
                 print("no valid targets!");
@@ -44,6 +75,7 @@ public class PlayerInBattle : MonoBehaviour {
             validEnemies = ListAllEnemies((int)Actions.HAMMER);
             if (validEnemies.Count > 0) {
                 print("hammer something");
+                SetCursor(validEnemies);
             }
             else {
                 print("no valid targets!");
@@ -57,6 +89,16 @@ public class PlayerInBattle : MonoBehaviour {
             //if NOT in a boss fight:
 
         }
+    }
+
+    //for any action that takes one target
+    public void SetCursor(List<GameObject> targets) {
+        arrow.transform.position = new Vector3(
+            targets[currentSelection].transform.position.x,
+            targets[currentSelection].transform.position.y + 3f,
+            0);
+        print("set cursor");
+        selectingSingleTarget = true;
     }
 
     public List<GameObject> ListAllEnemies(int attackChosen) {
@@ -80,6 +122,10 @@ public class PlayerInBattle : MonoBehaviour {
         }
 
         return validEnemies;
+    }
+
+    public void EnemiesAttack(List<GameObject> validEnemies) {
+
     }
 
     public void DamageIncoming() {

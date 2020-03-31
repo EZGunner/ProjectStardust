@@ -32,7 +32,7 @@ public class Enemy : MonoBehaviour
         targetPlayer.DamageIncoming();
     }
 
-    void TakeDamage(int damage) {
+    public void TakeDamage(int damage) {
         int incomingDamage = damage - defense;
         if (incomingDamage < 0) {
             incomingDamage = 0;
@@ -45,7 +45,9 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    void Die() {
-
+    public void Die() {
+        //placeholder code to show enemy "died"
+        this.gameObject.SetActive(false);
+        //Destroy(this.gameObject);
     }
 }
